@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <script src="../jslib/jquery-2.1.1.min.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-bootbox/bootbox.js"></script>
+    <script src="../jslib/bootstrap/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap3/css/bootstrap.css"/>
+
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-table/bootstrap-table.css"/>
+    <script src="../jslib/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+<!--    <link rel="stylesheet" href="../js/uploadify/uploadify.css" />
+    <script src="../js/uploadify/jquery.uploadify.js"></script>-->
+</head>
+<body>
+<!-- 条查  -->
+<div id="toolbar">
+    <form class="form-inline">
+        <div class="container">
+            <div class="form-group" style="float: left;margin-left: 10px">
+                <label for="username">用户名称</label>
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名称"/>
+            </div>
+            <div class="dropdown" style="float: left;margin-left: 10px">
+                <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">手机号
+                    <span class="caret"></span></button>
+                <ul class="dropdown-menu" id="phoneHtml" role="menu" aria-labelledby="menu1">
+
+                </ul>
+                <button type="button" onclick="searchUser()" class="btn btn-info glyphicon glyphicon-search">搜索</button>
+            </div>
+        </div>
+        <!--<div class="form-group">
+        </div>-->
+    </form>
+</div>
+<table id="myTable"></table>
+<!--修改密码弹框-->
+<div class="modal fade" id="myModal2" role="dialog" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×
+                </button>
+                <form id="userForm">
+                    <!--提交-->
+                    <div id="tijiao" style="display: block">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-7"><h4>修改密码</h4></div>
+                            </div><br/>
+                            <div class="row">
+                                <div class="col-sm-2">账号</div>
+                                <div class="col-sm-6">
+                                    <input type="text"  class="form-control" id="username2" />
+                                <input type="hidden"  class="form-control" id="id" name="id" />
+                                </div>
+                            </div>
+                            <br/>
+                            <div class="row">
+                                <div class="col-sm-2">新密码</div>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control"  name="password"/>
+                                </div>
+                            </div>
+                            <br/>
+  <!--                          <div class="row">
+                                <center><font size="3px" color="#008b8b">免费咨询400-069-6530</font><br/>
+
+                                    登录即视为同意《用户使用协议》及《隐私权条款》</center>
+                            </div>-->
+
+                        </div>
+                    </div>
+
+                </form>
+                <div class="modal-footer">
+                    <center>
+                        <button type="button" onclick="update()" class="btn btn-primary" style="display: block" id="logins" >
+                            确认修改
+                        </button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    /*//搜索*/
+/*    function search(){
+        $('#myTable').bootstrapTable('refresh');
+    }*/
+   /* function search(){
+        var username=$("#username").val();
+        //alert(carLike)
+        var options = $('#myTable').bootstrapTable('refresh', {
+            query:
+                {
+                    username:username
+                }
+        });
+
+    }*/
+
+    //搜索
+    function searchUser(){
+        $('#myTable').bootstrapTable('refresh');
+    }
+
+
+
+    //初始化页面
+    $(function(){
+        initMyTable();
+    })
+    //展示内容
+    function initMyTable(){
+        $('#myTable').bootstrapTable({
+            toolbar:'#toolbar',
+            url:'../queryUser',
+            pagination:true, //是否展示分页
+            pageList:[5,10,20,50],//分页组件
+            pageNumber:1,
+            pageSize:5,//默认每页条数
+            search:false,//是否显示搜索框
+            searchText:'试试',//初始化搜索文字
+            showColumns:false,//是否显示 内容列下拉框
+            showToggle:false,//是否显示 切换试图（table/card）按钮
+            showPaginationSwitch:false,//是否显示 数据条数选择框
+            showRefresh:false,//是否显示刷新按钮
+            detailView:false,//设置为 true 可以显示详细页面模式。
+            showFooter:false,//是否显示列脚
+            clickToSelect: true, //是否启用点击选中行
+            sidePagination:'server',//分页方式：client客户端分页，server服务端分页（*
+            striped:true,
+            queryParams:function(){              // 条查
+              var username=$("#username").val();
+                return {
+                    page: this.pageNumber,
+                    rows: this.pageSize,
+                    username: username
+
+                }
+            },
+            columns:[
+                {field:'id',title:'👨'},
+                {field:'username',title:'👨用户名称'},
+                {field:'phone',title:'👨用户手机号'},
+                {field:'password',title:'👨用户密码'},
+                {field:'123',title:'操作',formatter:function(value,row,index){
+                        return '<button type="button" style="height: 30px;width: 90px" onclick="del('+row.id+')" class="btn btn-default" data-dismiss="modal">删除</button>' + '<button type="button" style="height: 30px;width: 90px" onclick="blacklist('+row.id+')" class="btn btn-default">加入黑名单</button><button type="button" Class="btn btn-default" onclick="UpdateUserStatusToStar('+ row.id +')">星标用户</button><button type="button" style="height: 30px;width: 90px" onclick="updatePs('+row.id+',\''+row.username+'\')" class="btn btn-default">修改密码</button>';
+                }}
+            ]
+        })
+    }
+
+    //修改密码
+    function updatePs(id,username){
+        //alert(username);
+        $("#myModal2").modal("show");
+        $("#id").val(id);
+        $("#username2").val(username);
+    }
+    //确认修改
+    function update(){
+        $.post('../updatePss',$("#userForm").serialize(),function(){
+            bootbox.alert({
+                size: "small",
+                title: "提示",
+                message: "修改成功",
+            });
+            $("#myTable").bootstrapTable("refresh", {
+                silent: true //静态刷新
+            });
+        })
+    }
+    //黑名单
+    function blacklist(id){
+        //alert(id)
+        $.post('../blacklist',{id:id},function(){
+            bootbox.alert({
+                size: "small",
+                title: "提示",
+                message: "加入成功",
+            });
+            $("#myTable").bootstrapTable("refresh", {
+                silent: true //静态刷新
+            });
+        })
+    }
+    //删除
+    function del(id) {
+        $.post('../deletes',{id:id},function(){
+            bootbox.alert({
+                size: "small",
+                title: "提示",
+                message: "删除成功",
+            });
+            $("#myTable").bootstrapTable("refresh", {
+                silent: true //静态刷新
+            });
+        })
+    }
+    //批量删除
+    function dels() {
+        var arr = $('#myTable').bootstrapTable('getSelections');
+       if(arr.length == 0){
+            bootbox.alert({
+                size: "small",
+                title: "提示",
+                message: "请选择要删除的项!",
+            });
+            return;
+        }
+        bootbox.confirm({
+            size: "small",
+            message: "您确定要删除吗?",
+            callback: function(result){
+                if(result){
+                    var ids = "";
+                    $.each(arr,function(i){
+                        ids+=","+arr[i].id;
+                    })
+                    ids = ids.substr(1);
+                    alert(ids);
+                    $.ajax({
+                        url:'../delsUser',
+                        type:'post',
+                        data:{
+                            ids:ids
+                        },
+                        dataType:'json',
+                        success:function(data){
+                            if (data) {
+                                bootbox.alert("删除成功")
+                            }else{
+                                bootbox.alert("删除失败")
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    /**
+     * 星标用户  修改状态为3
+     * @param id
+     * @constructor
+     */
+    function UpdateUserStatusToStar(id) {
+        $.ajax({
+            url : "../UpdateUserStatusToStar?id="+id,
+            async : true,
+            type: "POST",
+            processData: false,
+            contentType:false,
+            dataType: "json",
+            success : function(data) {
+                if(data == 1){
+                    $('#myTable').bootstrapTable('refresh');
+                }
+            },
+            error : function(e){
+                alert("代码有问题，请打开F12和debug进行调试！");
+            }
+        });
+    }
+
+</script>
+</html>

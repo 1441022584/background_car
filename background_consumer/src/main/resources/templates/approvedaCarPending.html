@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>买车修改页面</title>
+    <script src="../jslib/jquery-2.1.1.min.js"></script>
+
+    <script src="../jslib/bootstrap/bootstrap-bootbox/bootbox.js"></script>
+    <script src="../jslib/bootstrap/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap3/css/bootstrap.css"/>
+
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-table/bootstrap-table.css"/>
+    <script src="../jslib/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+
+    <script src="../jslib/bootstrap/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css" />
+    <script src="../jslib/bootstrap/bootstrap-fileinput/js/fileinput.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-fileinput/js/locales/zh.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-fileinput/css/fileinput.css" />
+
+</head>
+<body>
+<style>
+    .row{
+        margin-top:10px;
+    }
+</style>
+<div class="container-fluid">
+    <form id="updateForm">
+        <div class="row">
+            <div>
+                <div class="col-xs-2">车辆信息：</div>
+                <div class="col-xs-4">
+                    <input type="hidden" id="iddd" name="id"/>
+
+                    <input type="hidden" id="carSeriesss" name="carSeries"/>
+                    <input type="hidden" id="carLicenseYearStr" name="carLicenseYearStr"/>
+                    <input type="hidden" id="carLicenseMonthStr" name="carLicenseMonthStr"/>
+                    <input type="hidden" id="carLicencesto" name="carLicencesto"/>
+                    <input type="hidden" id="carDemand" name="carDemand"/>
+                    <input type="hidden" id="carPrice" name="carPrice"/>
+                    <input type="hidden" id="carDisplacement" name="carDisplacement"/>
+                    <input type="hidden" id="carStatus" name="carStatus"/>
+                    <input type="hidden" id="carSite" name="carSite"/>
+                    <input type="hidden" id="carDetails" name="carDetails"/>
+
+                    <input type="hidden" id="carType1" name="carType"/>
+
+                    <span id="carType"></span>
+                </div>
+                <div class="col-xs-2">车辆状态：</div>
+                <div class="col-xs-4">
+                    <input type="hidden" id="carVehiclecondition1" name="carVehiclecondition"/>
+                    <span id="carVehiclecondition" ></span>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        <div class="row">
+            <div>
+                <div class="col-xs-2">上牌地：</div>
+                <div class="col-xs-4">
+                    <input type="hidden" id="carRoadroller1" name="carRoadroller"/>
+                    <span id="carRoadroller"></span>
+                </div>
+                <div class="col-xs-2">车辆牌照：</div>
+                <div class="col-xs-4">
+                    <input type="hidden" id="carLicenseplatenumber1" name="carLicenseplatenumber"/>
+                    <span id="carLicenseplatenumber"></span>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        <div class="row">
+            <div>
+                <div class="col-xs-2">车主信息：</div>
+                <div class="col-xs-4">
+                    <span id="username"></span>
+                </div>
+                <div class="col-xs-2">车主电话：</div>
+                <div class="col-xs-4">
+                    <span id="phone"></span>
+                </div>
+            </div>
+        </div>
+        <!--<div style="clear:both;"></div>
+        <div class="row">
+            <div>
+                <div class="col-xs-2">图片：</div>
+                <div class="col-xs-10">
+                    <input type="hidden" id="testimg" name="img" />
+                    &lt;!&ndash; projectfile &ndash;&gt;
+                    <input type="file"  class="projectfile" accept="image/*" name="img" id="headImgk" />
+                </div>
+            </div>
+        </div>-->
+    </form>
+</div>
+</body>
+<script type="text/javascript">
+
+    /* 时间格式 */
+    $('.date').datetimepicker({
+        language: 'zh-CN',//显示中文
+        format: 'yyyy-mm-dd',//显示格式
+        minView: "month",//设置只显示到月份
+        initialDate: new Date(),//初始化当前日期
+        autoclose: true,//选中自动关闭
+        todayBtn: true//显示今日按钮
+    });
+
+    /* 图片 */
+    /* <![CDATA[ */
+    /*$('#headImgk').fileinput({
+        language: 'zh', //设置语言
+        uploadUrl: '../upload', //上传的地址
+        allowedFileExtensions: ['jpg', 'gif', 'png'],//接收的文件后缀
+        showUpload: true, //是否显示上传按钮
+        showCaption: false,//是否显示标题
+        browseClass: "btn btn-primary", //按钮样式
+        //dropZoneEnabled: false,//是否显示拖拽区域
+        //minImageWidth: 50, //图片的最小宽度
+        //minImageHeight: 50,//图片的最小高度
+        //maxImageWidth: 1000,//图片的最大宽度
+        //maxImageHeight: 1000,//图片的最大高度
+        //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+        //minFileCount: 0,
+        maxFileCount: 1, //表示允许同时上传的最大文件个数
+        enctype: 'multipart/form-data',
+        validateInitialCount:true,
+        previewFileIcon: '<i class="glyphicon glyphicon-king"></i>',
+        msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+
+    }).on('fileuploaded', function(event, data, previewId, index) {
+        var imgval = $('#testimg').val();
+        if(imgval == null || imgval == "" || imgval == undefined){
+            imgval = 'http://<%= request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/'+data.response.img;
+        }else{
+            imgval += ','+'http://<%= request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/'+data.response.img;
+        }
+        $('#testimg').val(imgval);
+    });*/
+    /* ]]> */
+
+</script>
+</html>

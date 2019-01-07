@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <script type="text/javascript" src="../jslib/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="../jslib/highcharts/code/highcharts.js"></script>
+    <script type="text/javascript" src="../jslib/highcharts/code/modules/series-label.js"></script>
+    <script type="text/javascript" src="../jslib/highcharts/code/modules/exporting.js"></script>
+    <script type="text/javascript" src="../jslib/highcharts/code/modules/export-data.js"></script>
+</head>
+<body>
+
+<div id="container" style="width:800px;height:400px;float:left;margin-left:60px;"></div>
+
+
+</body>
+<script type="text/javascript">
+
+
+
+    $(function(){
+        $.ajax({
+            url:"../queryCarYearHighchartsList",
+            dataType:"json",
+            type:"post",
+            success:function(data){
+                //debugger;
+                var chart = Highcharts.chart('container',{
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: '统计2010-2018销量'
+                    },
+                    subtitle: {
+                        text: '数据来源: 瓜子二手车'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        column: {
+                            allowPointSelect:true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.c}年销量</b>: {point.y}辆'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: '每年车辆销量占比',
+                        colorByPoint: true,
+                        data:data
+                    }]
+                });
+
+            }
+        })
+    })
+
+
+
+</script>
+</html>

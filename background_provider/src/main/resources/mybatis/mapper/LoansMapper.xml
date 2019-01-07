@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.car.mapper.LoansMapper" >
+
+
+    <!--申请列表计数 Long queryLoansCount(@Param("borrower") BorrowerBean borrower);-->
+     <select id="queryLoansCount" resultType="java.lang.Long">
+         SELECT count(*)
+         from loans_borrower_status ls
+         <where>
+             ls.status_loans not in(4,5)
+             <if test="borrower.phone!=null and borrower.phone!=''  ">
+                 and ls.phone like '%${borrower.phone}%'
+             </if>
+             <if test="borrower.startTime!=null and borrower.startTime!=''">
+                 and ls.apply_time &gt; #{borrower.startTime}
+             </if>
+             <if test="borrower.endTime!=null and borrower.endTime!='' ">
+                 and ls.apply_time &lt; #{borrower.endTime}
+             </if>
+         </where>
+     </select>
+    <!--申请列表查询        List<BorrowerBean> loansList(@Param("start") int start, @Param("end")int end,@Param("borrower") BorrowerBean borrower);
+-->
+    <select id="loansList"  resultType="com.jk.car.model.BorrowerBean">
+        SELECT
+        ls.id,
+        ls.status_marriage marriage,
+        ls.status_work work,
+        ls.status_education education,
+        ls.status_housing housing,
+        ls.follow_time followtime,
+        ls.apply_time applytime,
+        ls.phone phone,
+        ls.status_loans statusLoans,
+        ls.staff_id staffId,
+        gz.staff_name staffName ,
+        gz.staff_phone staffPhone
+        from loans_borrower_status ls
+        LEFT join gz_staff gz on gz.staff_order = ls.id
+        <where>
+            ls.status_loans not in(4,5)
+        <if test="borrower.phone!=null and borrower.phone!=''  ">
+            and ls.phone like '%${borrower.phone}%'
+        </if>
+        <if test="borrower.startTime!=null and borrower.startTime!=''">
+            and ls.apply_time &gt; #{borrower.startTime}
+        </if>
+        <if test="borrower.endTime!=null and borrower.endTime!='' ">
+            and ls.apply_time &lt; #{borrower.endTime}
+        </if>
+        </where>
+            limit #{start},#{end}
+    </select>
+
+    <!--电话联系后修改状态 void finishPhone(@Param("borrower")BorrowerBean borrower);-->
+    <update id="finishPhone">
+        UPDATE loans_borrower_status ls
+        set ls.status_loans= 2,
+            ls.follow_time =#{borrower.followTime}
+        where ls.id = #{borrower.id}
+    </update>
+    <!--取消订单 void endLoans(@Param("borrower")BorrowerBean borrower);;-->
+    <update id="endLoans">
+        UPDATE loans_borrower_status ls
+        set ls.status_loans= 4
+        where ls.id = #{borrower.id}
+    </update>
+
+    <!--查询陪同看车 员工 List<StaffBean> staffList();-->
+        <select id="staffList" resultType="com.jk.car.model.StaffBean">
+            SELECT gzs.id staffId,
+                   gzs.staff_name staffName,
+                   gzs.staff_phone staffPhone,
+                   gzs.staff_area staffArea,
+                   gzs.staff_order staffOrder
+            from gz_staff gzs
+            where  gzs.staff_order is null
+        </select>
+
+
+    <!-- 安排陪同看车人员  void dispatchStaff(@Param("borrowerBean")BorrowerBean borrowerBean);-->
+        <update id="dispatchStaff">
+            UPDATE loans_borrower_status  ls
+            set ls.staff_id = #{borrowerBean.staffId},
+                ls.status_loans =6,
+                ls.follow_time =#{borrowerBean.followTime}
+            where ls.id = #{borrowerBean.id}
+        </update>
+
+    <!-- 修改派遣人员状态 为接单 void upStaffstart(@Param("staffId")Integer staffId,@Param("id") Integer id);-->
+          <update id="upStaffstart">
+              UPDATE gz_staff gz
+              set gz.staff_order = #{id}
+              where gz.id =#{staffId}
+          </update>
+
+   <!-- 修改派遣人员状态 为休息void upStaffstartnull(@Param("id")Integer id,@Param("staffId")Integer staffId);-->
+        <update id="upStaffstartnull">
+            UPDATE gz_staff gz
+            set gz.staff_order = null
+            where gz.id =#{staffId}
+        </update>
+   <!-- 完成贷款方案 修改订单的状态为 预定成功void finishAppoint(@Param("id")Integer id,@Param("staffId")Integer staffId);-->
+        <update id="finishAppoint">
+            UPDATE loans_borrower_status  ls
+            set  ls.status_loans =3
+            where ls.id = #{id}
+        </update>
+
+  <!-- 完成贷款方案 完成订单的状态为 void endOeder(@Param("borrower")BorrowerBean borrower);-->
+    <update id="endOeder">
+        UPDATE loans_borrower_status ls
+        set ls.status_loans= 5,
+            ls.follow_time =#{borrower.followTime},
+            ls.loans_compact = #{borrower.loansCompact}
+        where ls.id = #{borrower.id}
+    </update>
+
+
+
+
+</mapper>

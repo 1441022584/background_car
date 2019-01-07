@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.car.mapper.CarMapper" >
+  <resultMap id="BaseResultMap" type="com.jk.car.model.Car" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="car_type" property="carType" jdbcType="VARCHAR" />
+    <result column="car_series" property="carSeries" jdbcType="VARCHAR" />
+    <result column="car_license_year" property="carLicenseYear" jdbcType="DATE" />
+    <result column="car_license_month" property="carLicenseMonth" jdbcType="DATE" />
+    <result column="car_roadRoller" property="carRoadroller" jdbcType="VARCHAR" />
+    <result column="car_Licencesto" property="carLicencesto" jdbcType="VARCHAR" />
+    <result column="car_vehicleCondition" property="carVehiclecondition" jdbcType="VARCHAR" />
+    <result column="car_demand" property="carDemand" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="car_price" property="carPrice" jdbcType="DOUBLE" />
+    <result column="car_displacement" property="carDisplacement" jdbcType="DOUBLE" />
+    <result column="car_licensePlateNumber" property="carLicenseplatenumber" jdbcType="VARCHAR" />
+    <result column="car_status" property="carStatus" jdbcType="INTEGER" />
+    <result column="car_site" property="carSite" jdbcType="VARCHAR" />
+    <result column="car_parameter" property="carParameter" jdbcType="INTEGER" />
+    <result column="car_img" property="carImg" jdbcType="VARCHAR" />
+    <result column="car_details" property="carDetails" jdbcType="VARCHAR" />
+    <association property="userBean" column="user_id" select="com.jk.car.mapper.UserMapper.queryByIdUserBean"></association>
+  </resultMap>
+
+  <select id="queryCarBrandHighchartsList" resultType="java.util.LinkedHashMap">
+    select
+      count(1) as 个数
+    from t_car t where DATE_FORMAT(car_license_year,'%Y') = 2018
+    group by DATE_FORMAT(car_license_year,'%m')
+  </select>
+
+
+  <!-- 未审核卖车分页查询 -->
+  <select id="queryNotAuditPageList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from t_car where 1 = 1 and car_status = 5
+    limit #{start,jdbcType=NUMERIC},#{end,jdbcType=NUMERIC}
+  </select>
+
+  <!-- 未审核卖车查询总条数 -->
+  <select id="getNotAuditPageTotalCount" resultType="int">
+    select count(*) from t_car where 1 = 1 and car_status = 5
+  </select>
+
+  <!-- 已审核卖车查询分页 -->
+  <select id="queryTheApprovedPageList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from t_car where 1 = 1 and car_status = 2
+    limit #{start,jdbcType=NUMERIC},#{end,jdbcType=NUMERIC}
+  </select>
+
+  <!-- 已审核卖车查询总条数 -->
+  <select id="getTheApprovedPageTotalCount" resultType="int">
+    select count(*) from t_car where 1 = 1 and car_status = 2
+  </select>
+
+  <!-- 授权  将状态修改为1 -->
+  <update id="approved" parameterType="int">
+    update t_car set car_status = 1
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 审核 回显操作 根据id查询返回car对象 -->
+  <select id="queryByCarId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from t_car
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!-- 审核 授权 将状态修改为2 -->
+  <update id="saveOrUpdateCar" parameterType="com.jk.car.model.Car" >
+    update t_car
+    <set >
+      <if test="carType != null" >
+        car_type = #{carType,jdbcType=VARCHAR},
+      </if>
+      <if test="carSeries != null" >
+        car_series = #{carSeries,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicenseYear != null" >
+        car_license_year = #{carLicenseYear,jdbcType=DATE},
+      </if>
+      <if test="carLicenseMonth != null" >
+        car_license_month = #{carLicenseMonth,jdbcType=DATE},
+      </if>
+      <if test="carRoadroller != null" >
+        car_roadRoller = #{carRoadroller,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicencesto != null" >
+        car_Licencesto = #{carLicencesto,jdbcType=VARCHAR},
+      </if>
+      <if test="carVehiclecondition != null" >
+        car_vehicleCondition = #{carVehiclecondition,jdbcType=VARCHAR},
+      </if>
+      <if test="carDemand != null" >
+        car_demand = #{carDemand,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="carPrice != null" >
+        car_price = #{carPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="carDisplacement != null" >
+        car_displacement = #{carDisplacement,jdbcType=DOUBLE},
+      </if>
+      <if test="carLicenseplatenumber != null" >
+        car_licensePlateNumber = #{carLicenseplatenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        car_status = #{carStatus,jdbcType=INTEGER},
+      </if>
+      <if test="carSite != null" >
+        car_site = #{carSite,jdbcType=VARCHAR},
+      </if>
+      <if test="carParameter != null" >
+        car_parameter = #{carParameter,jdbcType=INTEGER},
+      </if>
+      <if test="carImg != null" >
+        car_img = #{carImg,jdbcType=VARCHAR},
+      </if>
+      <if test="carDetails != null" >
+        car_details = #{carDetails,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <!-- 逻辑删除数据 将状态改为888 -->
+  <update id="deleteOne" parameterType="int">
+    update t_car set car_status = 888
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 买车已审核查询List -->
+  <select id="queryaCarHasBeenCarefulPageList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from t_car where 1 = 1 and car_status = 4
+    limit #{start,jdbcType=NUMERIC},#{end,jdbcType=NUMERIC}
+  </select>
+
+  <!-- 买车已审核查询总条数 -->
+  <select id="getaCarHasBeenCarefulPageTotalCount" resultType="int">
+    select count(*) from t_car where 1 = 1 and car_status = 4
+  </select>
+
+
+
+  <!-- 买车待审核查询List -->
+  <select id="queryaCarPendingPageList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from t_car where 1 = 1 and car_status = 3
+    limit #{start,jdbcType=NUMERIC},#{end,jdbcType=NUMERIC}
+  </select>
+
+  <!-- 买车待审核查询总条数 -->
+  <select id="getaCarPendingPageTotalCount" resultType="int">
+    select count(*) from t_car where 1 = 1 and car_status = 3
+  </select>
+
+  <!-- 审核 买车授权 将状态修改为4 -->
+  <update id="UpdateaCarPendingCar" parameterType="com.jk.car.model.Car" >
+    update t_car
+    <set >
+      <if test="carType != null" >
+        car_type = #{carType,jdbcType=VARCHAR},
+      </if>
+      <if test="carSeries != null" >
+        car_series = #{carSeries,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicenseYear != null" >
+        car_license_year = #{carLicenseYear,jdbcType=DATE},
+      </if>
+      <if test="carLicenseMonth != null" >
+        car_license_month = #{carLicenseMonth,jdbcType=DATE},
+      </if>
+      <if test="carRoadroller != null" >
+        car_roadRoller = #{carRoadroller,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicencesto != null" >
+        car_Licencesto = #{carLicencesto,jdbcType=VARCHAR},
+      </if>
+      <if test="carVehiclecondition != null" >
+        car_vehicleCondition = #{carVehiclecondition,jdbcType=VARCHAR},
+      </if>
+      <if test="carDemand != null" >
+        car_demand = #{carDemand,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="carPrice != null" >
+        car_price = #{carPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="carDisplacement != null" >
+        car_displacement = #{carDisplacement,jdbcType=DOUBLE},
+      </if>
+      <if test="carLicenseplatenumber != null" >
+        car_licensePlateNumber = #{carLicenseplatenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        car_status = #{carStatus,jdbcType=INTEGER},
+      </if>
+      <if test="carSite != null" >
+        car_site = #{carSite,jdbcType=VARCHAR},
+      </if>
+      <if test="carParameter != null" >
+        car_parameter = #{carParameter,jdbcType=INTEGER},
+      </if>
+      <if test="carImg != null" >
+        car_img = #{carImg,jdbcType=VARCHAR},
+      </if>
+      <if test="carDetails != null" >
+        car_details = #{carDetails,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+
+
+
+
+
+  <sql id="Base_Column_List" >
+    id, car_type, car_series, car_license_year, car_license_month, car_roadRoller, car_Licencesto, 
+    car_vehicleCondition, car_demand, user_id, car_price, car_displacement, car_licensePlateNumber, 
+    car_status, car_site, car_parameter, car_img, car_details
+  </sql>
+
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_car
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.jk.car.model.Car" >
+    insert into t_car (id, car_type, car_series, 
+      car_license_year, car_license_month, car_roadRoller, 
+      car_Licencesto, car_vehicleCondition, car_demand, 
+      user_id, car_price, car_displacement, 
+      car_licensePlateNumber, car_status, car_site, 
+      car_parameter, car_img, car_details
+      )
+    values (#{id,jdbcType=INTEGER}, #{carType,jdbcType=VARCHAR}, #{carSeries,jdbcType=VARCHAR}, 
+      #{carLicenseYear,jdbcType=DATE}, #{carLicenseMonth,jdbcType=DATE}, #{carRoadroller,jdbcType=VARCHAR}, 
+      #{carLicencesto,jdbcType=VARCHAR}, #{carVehiclecondition,jdbcType=VARCHAR}, #{carDemand,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=INTEGER}, #{carPrice,jdbcType=DOUBLE}, #{carDisplacement,jdbcType=DOUBLE}, 
+      #{carLicenseplatenumber,jdbcType=VARCHAR}, #{carStatus,jdbcType=INTEGER}, #{carSite,jdbcType=VARCHAR}, 
+      #{carParameter,jdbcType=INTEGER}, #{carImg,jdbcType=VARCHAR}, #{carDetails,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.jk.car.model.Car" >
+    insert into t_car
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="carType != null" >
+        car_type,
+      </if>
+      <if test="carSeries != null" >
+        car_series,
+      </if>
+      <if test="carLicenseYear != null" >
+        car_license_year,
+      </if>
+      <if test="carLicenseMonth != null" >
+        car_license_month,
+      </if>
+      <if test="carRoadroller != null" >
+        car_roadRoller,
+      </if>
+      <if test="carLicencesto != null" >
+        car_Licencesto,
+      </if>
+      <if test="carVehiclecondition != null" >
+        car_vehicleCondition,
+      </if>
+      <if test="carDemand != null" >
+        car_demand,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="carPrice != null" >
+        car_price,
+      </if>
+      <if test="carDisplacement != null" >
+        car_displacement,
+      </if>
+      <if test="carLicenseplatenumber != null" >
+        car_licensePlateNumber,
+      </if>
+      <if test="carStatus != null" >
+        car_status,
+      </if>
+      <if test="carSite != null" >
+        car_site,
+      </if>
+      <if test="carParameter != null" >
+        car_parameter,
+      </if>
+      <if test="carImg != null" >
+        car_img,
+      </if>
+      <if test="carDetails != null" >
+        car_details,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="carType != null" >
+        #{carType,jdbcType=VARCHAR},
+      </if>
+      <if test="carSeries != null" >
+        #{carSeries,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicenseYear != null" >
+        #{carLicenseYear,jdbcType=DATE},
+      </if>
+      <if test="carLicenseMonth != null" >
+        #{carLicenseMonth,jdbcType=DATE},
+      </if>
+      <if test="carRoadroller != null" >
+        #{carRoadroller,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicencesto != null" >
+        #{carLicencesto,jdbcType=VARCHAR},
+      </if>
+      <if test="carVehiclecondition != null" >
+        #{carVehiclecondition,jdbcType=VARCHAR},
+      </if>
+      <if test="carDemand != null" >
+        #{carDemand,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="carPrice != null" >
+        #{carPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="carDisplacement != null" >
+        #{carDisplacement,jdbcType=DOUBLE},
+      </if>
+      <if test="carLicenseplatenumber != null" >
+        #{carLicenseplatenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        #{carStatus,jdbcType=INTEGER},
+      </if>
+      <if test="carSite != null" >
+        #{carSite,jdbcType=VARCHAR},
+      </if>
+      <if test="carParameter != null" >
+        #{carParameter,jdbcType=INTEGER},
+      </if>
+      <if test="carImg != null" >
+        #{carImg,jdbcType=VARCHAR},
+      </if>
+      <if test="carDetails != null" >
+        #{carDetails,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jk.car.model.Car" >
+    update t_car
+    <set >
+      <if test="carType != null" >
+        car_type = #{carType,jdbcType=VARCHAR},
+      </if>
+      <if test="carSeries != null" >
+        car_series = #{carSeries,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicenseYear != null" >
+        car_license_year = #{carLicenseYear,jdbcType=DATE},
+      </if>
+      <if test="carLicenseMonth != null" >
+        car_license_month = #{carLicenseMonth,jdbcType=DATE},
+      </if>
+      <if test="carRoadroller != null" >
+        car_roadRoller = #{carRoadroller,jdbcType=VARCHAR},
+      </if>
+      <if test="carLicencesto != null" >
+        car_Licencesto = #{carLicencesto,jdbcType=VARCHAR},
+      </if>
+      <if test="carVehiclecondition != null" >
+        car_vehicleCondition = #{carVehiclecondition,jdbcType=VARCHAR},
+      </if>
+      <if test="carDemand != null" >
+        car_demand = #{carDemand,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="carPrice != null" >
+        car_price = #{carPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="carDisplacement != null" >
+        car_displacement = #{carDisplacement,jdbcType=DOUBLE},
+      </if>
+      <if test="carLicenseplatenumber != null" >
+        car_licensePlateNumber = #{carLicenseplatenumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        car_status = #{carStatus,jdbcType=INTEGER},
+      </if>
+      <if test="carSite != null" >
+        car_site = #{carSite,jdbcType=VARCHAR},
+      </if>
+      <if test="carParameter != null" >
+        car_parameter = #{carParameter,jdbcType=INTEGER},
+      </if>
+      <if test="carImg != null" >
+        car_img = #{carImg,jdbcType=VARCHAR},
+      </if>
+      <if test="carDetails != null" >
+        car_details = #{carDetails,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jk.car.model.Car" >
+    update t_car
+    set car_type = #{carType,jdbcType=VARCHAR},
+      car_series = #{carSeries,jdbcType=VARCHAR},
+      car_license_year = #{carLicenseYear,jdbcType=DATE},
+      car_license_month = #{carLicenseMonth,jdbcType=DATE},
+      car_roadRoller = #{carRoadroller,jdbcType=VARCHAR},
+      car_Licencesto = #{carLicencesto,jdbcType=VARCHAR},
+      car_vehicleCondition = #{carVehiclecondition,jdbcType=VARCHAR},
+      car_demand = #{carDemand,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      car_price = #{carPrice,jdbcType=DOUBLE},
+      car_displacement = #{carDisplacement,jdbcType=DOUBLE},
+      car_licensePlateNumber = #{carLicenseplatenumber,jdbcType=VARCHAR},
+      car_status = #{carStatus,jdbcType=INTEGER},
+      car_site = #{carSite,jdbcType=VARCHAR},
+      car_parameter = #{carParameter,jdbcType=INTEGER},
+      car_img = #{carImg,jdbcType=VARCHAR},
+      car_details = #{carDetails,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+	<meta name="keywords" content="Flat Dark Web Login Form Responsive Templates, Iphone Widget Template, Smartphone login forms,Login form, Widget Template, Responsive Templates, a Ipad 404 Templates, Flat Responsive Templates" />
+	<link href="css/style.css" rel='stylesheet' type='text/css' />
+	<!--webfonts-->
+	<link href='http://fonts.useso.com/css?family=PT+Sans:400,700,400italic,700italic|Oswald:400,300,700' rel='stylesheet' type='text/css' />
+	<link href='http://fonts.useso.com/css?family=Exo+2' rel='stylesheet' type='text/css' />
+	<!--//webfonts-->
+	<!--<script src="http://ajax.useso.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      以上由模板提供自带   -->
+
+	<!-- 引入bootstrap的css -->
+	<link rel="stylesheet" href="../jslib/bootstrap/bootstrap3/css/bootstrap.min.css"/>
+	<!-- 引入bootstrap-treeview的css -->
+	<link rel="stylesheet"  href="../jslib/bootstrap/bootstrap-treeview/bootstrap-treeview.min.css" />
+	<!-- 引入bootstrap-addTabs的css -->
+	<link rel="stylesheet" href="../jslib/bootstrap/bootStrap-addTabs/bootstrap.addtabs.css"/>
+	<!-- 引入jquery -->
+	<script src="../jslib/jquery-2.1.1.min.js"></script>
+	<!-- 引入bootstrap的js-->
+	<script src="../jslib/bootstrap/bootstrap3/js/bootstrap.min.js"></script>
+	<!--<script type="text/javascript" src="../static/jslib/bootstrap/js/bootstrap.min.js"></script>-->
+	<!-- 引入bootstrap的js-->
+	<script type="text/javascript" src="../jslib/bootstrap/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+	<!-- 引入bootstrap的js-->
+	<script src="../jslib/bootstrap/bootStrap-addTabs/bootstrap.addtabs.min.js"></script>
+	<link rel="stylesheet" href="../jslib/bootstrap/bootstrap-table/bootstrap-table.css"/>
+	<script src="../jslib/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+	<script src="../jslib/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+	<script src="../jslib/bootstrap/bootstrap-bootbox/bootbox.js"></script>
+	<script src="../jslib/bootstrap/bootstrap-fileinput/js/fileinput.js"></script>
+	<script src="../jslib/bootstrap/bootstrap-fileinput/js/locales/zh.js"></script>
+	<link rel="stylesheet" href="../jslib/bootstrap/bootstrap-fileinput/css/fileinput.css"/>
+
+
+</head>
+<body>
+<script>$(document).ready(function(c) {
+    $('.close').on('click', function(c){
+        $('.login-form').fadeOut('slow', function(c){
+            $('.login-form').remove();
+        });
+    });
+});
+</script>
+<!--SIGN UP-->
+<h1 >瓜子二手车管理系统</h1>
+<div class="login-form" >
+	<div class="close"> </div>
+	<div class="head-info">
+		<label class="lbl-1"> </label>
+		<label class="lbl-2"> </label>
+		<label class="lbl-3"> </label>
+	</div>
+	<div class="clear"> </div>
+	<div class="avtar">
+		<!--<img src="images/avtar.png" />-->
+		<img src="../images/loginlogo.jpg" style="width: 100px ; height: 90px" class="img-circle" />
+	</div>
+	<form action="/login" method="post">
+<!--
+		<input type="text" class="text" value = '请输入用户名 ' onfocus="this.value = '';" onblur="if (this.value == '') {this.value = '请输入用户名';}" />
+-->
+		<input type="text" name="username" placeholder="请输入用户名"  />
+
+		<div class="key">
+			<input type="password" name="password"  placeholder="请输入密码"/>
+		</div>
+
+		<div >
+			<input type="submit" value="Login" />
+		</div>
+	</form>
+</div>
+<div class="copy-rights">
+	<p>Copyright &copy; 2018.Company name All rights reserved.More Templates <a href="http://www.cssmoban.com/" target="_blank" title="瓜子二手车">瓜子二手车</a> - Collect from <a href="http://www.cssmoban.com/" title="精选二手车" target="_blank">精选二手车</a></p>
+</div>
+
+</body>
+</html>

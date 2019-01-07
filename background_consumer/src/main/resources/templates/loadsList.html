@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <!-- 引入bootstrap的css -->
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap3/css/bootstrap.min.css"/>
+    <!-- 引入bootstrap-treeview的css -->
+    <link  href="../jslib/bootstrap/bootstrap-treeview/bootstrap-treeview.min.css" rel="stylesheet" />
+    <!-- 引入bootstrap-addTabs的css -->
+    <link rel="stylesheet" href="../jslib/bootstrap/bootStrap-addTabs/bootstrap.addtabs.css"/>
+    <!-- 引入jquery -->
+    <script src="../jslib/jquery-2.1.1.min.js"></script>
+    <!-- 引入bootstrap的js-->
+    <script src="../jslib/bootstrap/bootstrap3/js/bootstrap.min.js"></script>
+    <!--<script type="text/javascript" src="../static/jslib/bootstrap/js/bootstrap.min.js"></script>-->
+    <!-- 引入bootstrap的js-->
+    <script type="text/javascript" src="../jslib/bootstrap/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <!-- 引入bootstrap的js-->
+    <script src="../jslib/bootstrap/bootStrap-addTabs/bootstrap.addtabs.min.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-table/bootstrap-table.css"/>
+    <script src="../jslib/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-bootbox/bootbox.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-fileinput/js/fileinput.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-fileinput/js/locales/zh.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-fileinput/css/fileinput.css"/>
+    <script src="../jslib/bootstrap/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css"/>
+
+
+
+
+    <style type="text/css">
+        body {padding-top:15px;}
+        .img-responsive {
+            display: block;
+            height: auto;
+            max-width: 100%;
+            max-height: 95%;
+        }
+
+        .bella-checkbox{
+            position: relative;
+        }
+        /** 将初始的checkbox的样式改变 */
+        .bella-checkbox input[type="checkbox"] {
+            opacity: 0; /*将初始的checkbox隐藏起来*/
+        }
+
+        /** 设计新的checkbox，位置 */
+        .bella-checkbox label:before {
+            content: '';
+            width: 19px;
+            height: 19px;
+            display: inline-block;
+            border-radius: 2px;
+            border: 1px solid #bbb;
+            background: #fff;
+        }
+
+        /** 点击初始的checkbox，将新的checkbox关联起来 */
+        .bella-checkbox input[type="checkbox"]:checked + label:after {
+            display: inline-block;
+            font-family: 'Glyphicons Halflings';
+            content: "\e013";
+            top: 15%;
+            left: 10%;
+            position: absolute;
+            font-size: 11px;
+            line-height: 1;
+            width: 16px;
+            height: 16px;
+            color: #333;
+        }
+
+        .bella-checkbox label {
+            cursor: pointer;
+            text-align: center;
+            position: absolute;
+            left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!--  col-xs-	.col-sm-	.col-md-	.col-lg- -->
+    <div class="container-fluid">
+        <div id="toolbar">
+            <div class="row">
+                <form id="client_form" class="form-inline">
+                    <div class="col-xs-2 col-md-4">
+                        <img class="img-responsive"  src="../images/loginlogo.jpg" height="60" width="60"/>
+                    </div>
+
+                    <div class="col-xs-10 col-md-8">
+                    <div class="form-group">
+                        <label for="phone">客户手机号</label>
+                        <input type="text" class="form-control" style="width: 130px" id="phone" placeholder="客户手机号"/>
+                        <label >申请日期</label>
+                        <input  class="form-control date"  id="startTime" placeholder="开始日期"/>
+                        <label >--</label>
+                        <input  class="form-control date"  id="endTime" placeholder="结束日期"/>
+                        <button type="button" class="btn btn-success" onclick="search()">搜索</button>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr size="3" color="#7fff00" />
+        <div>
+             <table id="loansTable" ></table>
+            <input type="hidden" id="hiddenId" />
+            <input type="hidden" id="hiddenPhone" />
+            <input type="hidden" id="hiddenstaffId" />
+        </div>
+
+        <!-- 打电话模态框（Modal） -->
+        <div class="modal fade" id="myPhoneModal" style="color: #505053"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">电话联系</h4>
+                    </div>
+                    <div class="modal-body">
+                       <div >
+                             <center>
+                                 请即时联系手机号为
+                                <font size="5" color="lime"><span id="phoneModalSpan">.</span></font>
+                                 的客户，确定购买方案。
+                             </center>
+                       </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">电话未接通</button>
+                        <button type="button" class="btn btn-primary" onclick="finishPhone()">完成电话联系</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!-- 预约看车模态框（Modal2）展示员工 -->
+        <div class="modal fade" style="color: #484856" id="appointModal2"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel2" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel2">预约看车，派遣陪同看车人员</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div >
+                           <form id="staff_form" class="form-inline">
+                           <div id="toolbar2">
+                           </div>
+                           </form>
+                            <p class="bg-primary">
+                                为客户手机号是
+                           <font size="5" color="lime"><span id="phoneModalSpan2">.</span></font>
+                                的客户选择陪同看车人员。
+                            </p>
+                        </div>
+                        <div>
+                            <table id="staffTable"></table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消派遣</button>
+                        <button type="button" class="btn btn-primary" onclick="dispatch()">确认派遣</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+        <!--完成订单 放款提车模态框-->
+        <div class="modal fade" style="color: #484856" id="endOrderModal"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel3" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel3">贷款方案，上传合同</h4>
+                </div>
+                <div class="modal-body">
+                    <div >
+                        <p class="bg-primary">
+                            填写已签署的贷款合同详情<br/>
+                            客户为手机号为
+                            <font size="5" color="lime"><span id="phoneModalSpan3">.</span></font>
+                        </p>
+                    </div>
+                    <div>
+                        <form  id="compactFrom">
+                            <div class="form-group">
+                               <center><label >合同内容</label></center>
+                                <textarea class="form-control" name="loansCompact" id="loansCompact" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="endOeder()">确认</button>
+                    </div>
+                </div>
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+
+    </div>
+</body>
+<script type="text/javascript">
+    $('.date').datetimepicker({
+        language: 'zh-CN',//显示中文
+        format: 'yyyy-mm-dd',//显示格式
+        minView: "month",//设置只显示到月份
+        initialDate: new Date(),//初始化当前日期
+        autoclose: true,//选中自动关闭
+        todayBtn: true//显示今日按钮
+    });
+
+    $(function(){
+        initLoansTable();
+    })
+
+    //条查
+    function search(){
+        $("#loansTable").bootstrapTable('refresh',
+            {query: {
+                    /*  var endTime =  $("#endTime").data("datetimepicker").getDate();*/
+                    "phone":$("#phone").val(),
+                    "startTime":$("#startTime").val(),
+                    "endTime":$("#endTime").val()
+                }}
+           );
+       }
+    /**
+     * 申请列表
+     */
+    function initLoansTable(){
+        $("#loansTable").bootstrapTable({
+            toolbar:"toolbar",
+            url:"../loansList",
+            pagination:true, //是否展示分页
+            pageList:[5, 10, 20, 50],//分页组件
+            pageNumber:1,
+            pageSize:10,//默认每页条数
+            search:false,//是否显示搜索框
+            //searchText:'试试',//初始化搜索文字
+            showColumns:false,//是否显示 内容列下拉框
+            showToggle:false,//是否显示 切换试图（table/card）按钮
+            showPaginationSwitch:false,//是否显示 数据条数选择框
+            showRefresh:false,//是否显示刷新按钮
+            //detailView:true,//设置为 true 可以显示详细页面模式。
+            showFooter:true,//是否显示列脚
+            clickToSelect: true, //是否启用点击选中行
+            sidePagination:'server',//分页方式：client客户端分页，server服务端分页（*
+            striped:true,
+            queryParams:function(){
+              return{
+                    page:this.pageNumber,
+                    rows:this.pageSize
+                }
+            },
+            columns:[
+                {field:'marriage',title:'婚姻状况',align:'center',width:100,
+                    formatter:function(value,row,index){
+                        if (value!=null) {
+                            if(value == 1){return "丧偶"}
+                            if(value == 2){return "未婚"}
+                            if(value == 3){return "离婚"}
+                            if(value == 4){return "已婚"}
+                        }
+                    }},
+                {field:'work',title:'工作状况',align:'center',width:100,
+                    formatter:function(value,row,index){
+                        if (value!=null) {
+                            if(value == 1){return "自由职业"}
+                            if(value == 2){return "个体商户"}
+                            if(value == 3){return "民营企业"}
+                            if(value == 4){return "三资企业"}
+                            if(value == 5){return "国企/央企/大型股份制公司"}
+                            if(value == 6){return "政府机关/事业单位"}
+                        }
+                    }},
+                {field:'education',title:'教育水平',align:'center',width:100,
+                    formatter:function(value,row,index){
+                        if (value!=null) {
+                            if(value == 1){return "文盲/半文盲"}
+                            if(value == 2){return "小学"}
+                            if(value == 3){return "初中"}
+                            if(value == 4){return "高中"}
+                            if(value == 5){return "技术学校"}
+                            if(value == 6){return "大专"}
+                            if(value == 7){return "本科"}
+                            if(value == 8){return "研究生及以上"}
+                        }
+                    }},
+                {field:'housing',title:'住房状况',align:'center',width:100,
+                    formatter:function(value,row,index){
+                        if (value!=null) {
+                            if(value == 1){return "宿舍"}
+                            if(value == 2){return "租房"}
+                            if(value == 3){return "自建房"}
+                            if(value == 4){return "父母名下房产"}
+                            if(value == 5){return "本地按揭房产"}
+                            if(value == 6){return "父母名下房产"}
+                            if(value == 7){return "本地自有商品房"}
+                            if(value == 8){return "自有按揭商品房"}
+                            if(value == 9){return "自有全款商品房"}
+                        }
+                    }},
+                {field:'statusLoans',title:'贷款状态',align:'center',width:100,
+                    formatter:function(value,row,index){
+                        var a ="";
+                        if (value!=null) {
+                            if(value == 1){
+                                var a = '<span style="color:#e38d13">未处理申请</span>';
+                            }
+                            if(value == 2){
+                                var a = '<span style="color:green">已电话联系</span>';
+                            }
+                            if(value == 3){
+                                var a = '<span style="color:#0088cc">已预约看车</span>';
+                            }
+                            if(value == 6){
+                                var a = '<span style="color:#f15c80">重新预约中</span>';
+                            }
+                            if(value == 4){
+                                var a = '<span style="color:#FF0000">已放弃申请</span>';
+                            }
+                            if(value == 5){
+                                var a = '<span >已放款提车</span>';
+                            }
+                            return a;
+                        }
+                    }},
+                {field:'phone',title:'预留电话',align:'center',width:100 },
+                {field:'applyTime',title:'申请贷款时间',align:'center',width:100},
+                {field:'followTime',title:'最后跟进时间',align:'center',width:100},
+                {field:'staffName',title:'陪看人员姓名',align:'center',width:100},
+                {field:'staffPhone',title:'陪看人员手机',align:'center',width:100},
+                {field:'pingfen',title:'参考评分',width:160,align:'center',
+                    formatter:function(value,row) {
+                     var count= row.marriage+row.work+row.education+row.housing;
+                     var  count2 = Math.ceil(count/0.27);
+                     var  aa ="综合评分为"+count2+"%";
+                         return aa
+                    }},
+                {field:'chaozuo',title:'操作',width:220,
+                    formatter:function(value,row){
+                        if (row.statusLoans==1) {
+                            return '<button  onclick="toPhone('+row.phone+','+row.id+')"  class="btn btn-info">电话联系</button> ' +
+                                '<button onclick="quxiao('+row.phone+','+row.id+')" class="btn btn-danger">取消申请</button>';
+                        }
+                        if (row.statusLoans==2) {
+                            return '<button  onclick="openAppointCar('+row.phone+','+row.id+')"  class="btn btn-success">预约看车</button>' +
+                                '<button onclick="quxiao('+row.phone+','+row.id+')" class="btn btn-danger">取消申请</button>';
+                        }
+                        if (row.statusLoans==3) {
+                            return '<button  onclick="toendOeder('+row.phone+','+row.id+','+row.staffId+',)"  class="btn btn-primary">放款提车</button> ' +
+                                '<button onclick="quxiao('+row.phone+','+row.id+')" class="btn btn-danger">取消申请</button>';;
+                        }
+                        if (row.statusLoans==6) {
+                            return '<button  onclick="openAppointCar('+row.id+')"  class="btn btn-warning">重新预约</button> ' +
+                                '<button  onclick="finishAppoint('+row.id+','+row.staffId+','+row.phone+')"  class="btn btn-primary">完成看车</button> ' +
+                                '<button onclick="quxiao('+row.phone+','+row.id+')" class="btn btn-danger">取消申请</button>';;
+                        }
+                    }
+                }
+            ]
+        })
+    }
+
+
+    /**
+     * 派遣员工列表
+     */
+    function initStaffTable(){
+        $("#staffTable").bootstrapTable({
+            url:"../staffList",
+           // pagination:true, //是否展示分页
+           // pageList:[5, 10, 20, 50],//分页组件
+           // pageNumber:1,
+           // pageSize:10,//默认每页条数
+            search:false,//是否显示搜索框
+            //searchText:'试试',//初始化搜索文字
+            showColumns:false,//是否显示 内容列下拉框
+            showToggle:false,//是否显示 切换试图（table/card）按钮
+            showPaginationSwitch:false,//是否显示 数据条数选择框
+            showRefresh:false,//是否显示刷新按钮
+            //detailView:true,//设置为 true 可以显示详细页面模式。
+            showFooter:true,//是否显示列脚
+            clickToSelect: false, //是否启用点击选中行
+           // sidePagination:'server',//分页方式：client客户端分页，server服务端分页（*
+            striped:true,
+            /*queryParams:function(){
+                return{
+                    page:this.pageNumber,
+                    rows:this.pageSize
+                }
+            },*/
+            columns:[
+                {checkbox: true},
+                {field:'staffId',title:'员工id',align:'center',width:100 },
+                {field:'staffName',title:'员工姓名',align:'center',width:100 },
+                {field:'staffPhone',title:'员工手机',align:'center',width:100},
+                {field:'staffArea',title:'工作区域',align:'center',width:100},
+                {field:'staffOrder',title:'接派订单',align:'center',width:100}
+                 ] }
+         )}
+
+    /**
+     * 联系客户弹框
+     */
+     function toPhone(phone,id){
+         $("#hiddenPhone").val(phone);
+         $("#hiddenId").val(id);
+         $("#phoneModalSpan").html(phone);
+         $("#myPhoneModal").modal("show");
+
+     }
+    /**
+     * 通话结束（修改状态）
+     */
+     function  finishPhone(){
+        var id = $("#hiddenId").val();
+        $.ajax({
+            url:"../finishPhone",
+            type:"post",
+            data:{id,id},
+            success:function(data){
+                bootbox.alert({
+                    size: "small",
+                    title:"提示",
+                    message:"通话结束后请及时安排工作人员预约看车哦！",
+                    callback:function(data){
+                        if(!data){
+                            $("#myPhoneModal").modal("hide");
+                            search();
+                        }
+                        else{
+                            $("#myPhoneModal").modal("hide");
+                            search();
+                        }
+                        }
+                });
+            },
+            error:function(){
+            }
+        })
+     }
+
+    /**
+     * 取消申请
+     */
+    function quxiao(phone,id){
+        bootbox.confirm({
+            size: "small",
+            message:"是否删除来自于手机号为"+phone+"的申请？",
+            buttons: {
+                confirm: {
+                    label: '确认',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: '取消',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result){
+                if (result) {
+                    $.ajax({
+                        url:"../endLoans",
+                        type:"post",
+                        data:{id:id},
+                        success:function(data){
+                            bootbox.alert({
+                                size: "small",
+                                title:"提示",
+                                message:"取消成功！",
+                                callback:function(){
+                                    $("#myPhoneModal").modal("hide");
+                                    search();
+                                }
+                            });
+                        },
+                        error:function(){
+                            bootbox.alert({
+                                size: "small",
+                                title:"提示",
+                                message:"取消失败！",
+                                callback:function(){
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        })
+    }
+    /**
+     * 预看车弹框
+     */
+    function openAppointCar(phone,id){
+        $("#hiddenPhone").val(phone);
+        $("#hiddenId").val(id);
+        $("#phoneModalSpan2").html(phone);
+        $('#staffTable').bootstrapTable('destroy');
+        initStaffTable();
+        $("#appointModal2").modal("show");
+
+    }
+
+    /**
+     *派遣陪同看车 人员
+     */
+    function dispatch(){
+        var arr= $("#staffTable").bootstrapTable('getSelections');
+        if(arr.length != 1){
+            bootbox.alert({
+                size: "small",
+                title:"提示",
+                message:"请安排一名陪同工作人员！",
+                callback:function(){
+                }
+            });
+            return ;
+        }else{
+            var staffid=(arr[0].staffId);
+            var loansid= $("#hiddenId").val();
+            $.ajax({
+              url:'../dispatchStaff',
+              type:'post',
+              data:{staffId:staffid,id:loansid},
+              dataType:'json',
+              success:function(data){
+                  if(data){
+                      bootbox.alert({
+                      size: "small",
+                      title:"提示",
+                      message:"成功安排人员！",
+                      callback:function(){
+                      }
+                      });
+                      $("#appointModal2").modal("hide");
+                      search();
+                  }
+
+                } ,
+                error:function(){
+                    bootbox.alert({
+                        size: "small",
+                        title:"提示",
+                        message:"安排人员失败！",
+                        callback:function(){
+                        }
+                    });
+                    search();
+                }
+            })
+        }
+        }
+
+    /**
+     * 完成预约 制定好方案
+     * @param id
+     * @param staffId
+     */
+      function  finishAppoint(id,staffId,phone) {
+        bootbox.confirm({
+            size: "small",
+            message:"是否已为手机号为"+phone+"的客户制定好贷款方案？",
+            buttons: {
+                confirm: {
+                    label: '确认',
+                    className: 'btn-success'
+                },
+                cancel: {
+                    label: '取消',
+                    className: 'btn-danger'
+                }
+            },
+            callback: function(result){
+                if (result) {
+                    $.ajax({
+                        url:"../finishAppoint",
+                        type:"post",
+                        data:{id: id,staffId: staffId},
+                        success:function(data){
+                            bootbox.alert({
+                                size: "small",
+                                title:"提示",
+                                message:"保存成功！",
+                                callback:function(){
+                                    $("#myPhoneModal").modal("hide");
+                                    search();
+                                }
+                            });
+                        },
+                        error:function(){
+                            bootbox.alert({
+                                size: "small",
+                                title:"提示",
+                                message:"保存失败！",
+                                callback:function(){
+                                }
+                            });
+                        }
+                    })
+                }
+            }
+        })
+    }
+    /**
+     *  放款 弹框 填写合同详情
+     * @param phone
+     * @param id
+     */
+    function toendOeder(phone,id,staffId){
+        $("#hiddenPhone").val(phone);
+        $("#hiddenId").val(id);
+        $("#hiddenstaffId").val(staffId);
+        $("#phoneModalSpan3").html(phone);
+        $("#endOrderModal").modal("show");
+
+    }
+    /**
+     *  放款提车  结束订单
+     */
+    function endOeder(){
+       var  compact =$("#loansCompact").val();
+       var id= $("#hiddenId").val();
+       var staffId = $("#hiddenstaffId").val();
+        $.ajax({
+            url:'../endOeder',
+            type:"post",
+            data:{loansCompact:compact,id:id,staffId:staffId},
+            cache:false,//false是不缓存，true为缓存
+            async:true,//true为异步，false为同步
+            success:function(data){
+                //请求成功时
+                alert('贷款购车方案制定完成');
+                $("#endOrderModal").modal('hide');
+                window.location.reload()//重新加载页面
+            },
+            error:function(data){
+                //请求失败时
+                alert("数据保存失败.");
+                $(":input","#compactFrom")
+                    .not(":button, :submit, :reset, :hidden")
+                    .val("")
+                    .removeAttr("checked")
+                    .removeAttr("selected");
+            }
+        })
+    }
+</script>
+</html>

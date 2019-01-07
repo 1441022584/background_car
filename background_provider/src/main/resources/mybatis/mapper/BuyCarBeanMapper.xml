@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.car.mapper.BuyCarBeanMapper" >
+  <resultMap id="BaseResultMap" type="com.jk.car.model.BuyCarBean" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="car_type" property="cartype" jdbcType="VARCHAR" />
+    <result column="car_series" property="carSeries" jdbcType="VARCHAR" />
+    <result column="car_license_year" property="carLicenseYear" jdbcType="DATE" />
+    <result column="car_license_month" property="carLicenseMonth" jdbcType="DATE" />
+    <result column="car_roadRoller" property="carRoadroller" jdbcType="VARCHAR" />
+    <result column="car_Licencesto" property="carLicencesto" jdbcType="VARCHAR" />
+    <result column="car_vehicleCondition" property="carVehiclecondition" jdbcType="VARCHAR" />
+    <result column="car_demand" property="carDemand" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="car_price" property="carPrice" jdbcType="DOUBLE" />
+    <result column="car_displacement" property="carDisplacement" jdbcType="DOUBLE" />
+    <result column="car_licensePlateNumber" property="carLicenseplatenumber" jdbcType="VARCHAR" />
+    <result column="car_status" property="carStatus" jdbcType="INTEGER" />
+    <result column="car_site" property="carSite" jdbcType="VARCHAR" />
+    <result column="car_parameter" property="carParameter" jdbcType="INTEGER" />
+    <result column="car_img" property="carImg" jdbcType="VARCHAR" />
+    <result column="car_details" property="carDetails" jdbcType="VARCHAR" />
+    <result column="car_time" property="carTime" jdbcType="INTEGER" />
+    <result column="carage" property="carage" jdbcType="INTEGER" />
+    <result column="mileage" property="mileage" jdbcType="INTEGER" />
+    <result column="carpart" property="carpart" jdbcType="INTEGER" />
+    <result column="carshift" property="carshift" jdbcType="INTEGER" />
+    <result column="carseat" property="carseat" jdbcType="INTEGER" />
+  </resultMap>
+
+
+
+  <!--总条数-->
+  <select id="queryCountList" resultType="long">
+    select count(*) from t_car
+  </select>
+    <!--分页查询-->
+  <select id="findUserList" parameterType="map" resultMap="BaseResultMap">
+         select * from t_car  limit #{page},#{rows}
+   </select>
+</mapper>

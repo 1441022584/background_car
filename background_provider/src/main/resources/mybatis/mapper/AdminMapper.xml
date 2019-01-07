@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jk.car.mapper.AdminMapper" >
+
+    <!--修改密码-->
+    <update id="updatePss"  >
+        UPDATE t_user set password=#{password}  where id=#{id}
+    </update>
+
+    <!-- 查询所有用户信息手机号 -->
+    <select id="queryUser" parameterType="map" resultType="com.jk.car.model.UserBean">
+        select id,username,phone,password from  t_user where status=1
+          <include refid="UserSql"></include>
+           limit  ${(page-1)*rows},${rows}
+    </select>
+    <!--tiaocha-->
+    <sql id="queryWhere">
+        <if test="userBean.username != null and userBean.username != '' ">
+            and username = #{userBean.username}
+        </if>
+    </sql>
+    <!-- 查询所有用户数量 -->
+    <select id="queryUserCount"  parameterType="map" resultType="int">
+        select count(*) from t_user where status = 2 <include refid="UserSql"></include>
+    </select>
+
+    <sql id="UserSql">
+        <if test="user.username != null and user.username != '' ">
+            and username like '%${user.username}%'
+        </if>
+        <if test="user.phone != null and user.phone != '' and user.phone != '0' ">
+            and phone = #{user.phone}
+        </if>
+    </sql>
+
+
+    <!--黑名单-->
+    <update id="blacklist" parameterType="int">
+        UPDATE t_user set status=2  where id=#{value}
+    </update>
+
+    <!-- 查询黑名单 -->
+    <select id="queryBlacklist" parameterType="map" resultType="com.jk.car.model.UserBean">
+        select id,username,phone,password from  t_user where 1=1 and status=2
+        <include refid="queryWhere"></include>
+        limit  ${(page-1)*rows},${rows}
+    </select>
+    <select id="queryBlacklistCount"  parameterType="map" resultType="int">
+        select count(*) from t_user where 1=1 and status=2
+        <include refid="queryWhere"></include>
+    </select>
+
+    <!-- 批量删除 -->
+    <delete id="dels" parameterType="int" >
+        delete t_user t where t.id in (
+        <foreach collection="array" index="index" item="item" separator=",">
+            #{item}
+        </foreach>
+        )
+    </delete>
+
+<!--    <delete id="updates" parameterType="int" >
+        delete from t_user  where id =#{id}
+    </delete>-->
+
+    <update id="updates"  parameterType="int" >
+         update t_user  set status = 888 where id = #{value}
+    </update>
+
+
+</mapper>

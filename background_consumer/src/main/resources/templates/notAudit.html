@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"
+
+
+
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+
+
+
+>
+<head>
+    <meta charset="UTF-8" />
+    <title>卖车待审核页面</title>
+    <script src="../jslib/jquery-2.1.1.min.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-bootbox/bootbox.js"></script>
+    <script src="../jslib/bootstrap/bootstrap3/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap3/css/bootstrap.css"/>
+
+    <link rel="stylesheet" href="../jslib/bootstrap/bootstrap-table/bootstrap-table.css"/>
+    <script src="../jslib/bootstrap/bootstrap-table/bootstrap-table.js"></script>
+    <script src="../jslib/bootstrap/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+</head>
+<body>
+<!-- 条查
+<div id="toolbar">
+    <div class="form-group">
+        <input type="button" value="删除" class="btn btn-danger"/>
+        <button type="button" Class="btn btn-info glyphicon glyphicon-plus" onclick="addDialog()">新增</button>
+    </div>
+</div>-->
+
+    <table id="myTable"></table>
+
+</body>
+<script>
+    //初始化页面
+    $(function(){
+        initMyTable();
+    })
+    //展示内容
+    function initMyTable(){
+        $('#myTable').bootstrapTable({
+            toolbar:'#toolbar',
+            url:'../queryNotAuditPageList',
+            pagination:true, //是否展示分页
+            pageList:[5,10,20,50],//分页组件
+            pageNumber:1,
+            pageSize:5,//默认每页条数
+            search:false,//是否显示搜索框
+            searchText:'试试',//初始化搜索文字
+            showColumns:false,//是否显示 内容列下拉框
+            showToggle:false,//是否显示 切换试图（table/card）按钮
+            showPaginationSwitch:false,//是否显示 数据条数选择框
+            showRefresh:false,//是否显示刷新按钮
+            detailView:false,//设置为 true 可以显示详细页面模式。
+            showFooter:false,//是否显示列脚
+            clickToSelect: true, //是否启用点击选中行
+            sidePagination:'server',//分页方式：client客户端分页，server服务端分页（*
+            striped:true,
+            queryParams:function(){              // 条查
+                return {
+                    page: this.pageNumber,
+                    rows: this.pageSize
+                }
+            },
+            columns:[
+                {field:'carSite',formatter:function(value,row,index){
+                    debugger;
+                        var html = "";
+                        html += '<div style="color: #fefdfc"><a title="" href=""><div style="float: left"><img src="'+ row.carImg +'" width="150px" height="150px"/></div></a>';
+                        html += '<div style="float: left"><br/>&nbsp;&nbsp;&nbsp;&nbsp;<font size="5px" color="black">车辆信息:'+row.carType+'</font>&nbsp;&nbsp;&nbsp;&nbsp;<br/><br/>';
+                        html += '<font color="black">&nbsp;&nbsp;&nbsp;&nbsp;车辆状态:'+row.carVehiclecondition+'&nbsp;&nbsp;&nbsp;&nbsp;';
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;补贴后:&nbsp;'+row.carPrice+'&nbsp;万&nbsp;&nbsp;&nbsp;&nbsp;' ;
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;上牌地:&nbsp;'+row.carRoadroller+'&nbsp;&nbsp;&nbsp;&nbsp;<br/><br/>';
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;车辆牌照:&nbsp;'+row.carLicenseplatenumber+'&nbsp;&nbsp;&nbsp;&nbsp;</font></div></div>';
+                        html += '<div style="float: right"><br/>车主信息:' + row.userBean.username + '<br/><br/>车主电话:' + row.userBean.phone + '<br/><br/><br/>';
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button shiro:hasPermission="user:query" type="button" Class="btn btn-default" onclick="approved('+ row.id +')">通过审核</button>';
+                        html += '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                        html += '<button shiro:hasPermission="user:query" type="button" Class="btn btn-default" onclick="deleteOne('+ row.id +')">删除信息</button></div>';
+                        return html;
+                    }}
+                /*{field:'123',title:'操作',formatter:function(value,row,index){
+                        return '<button type="button" style="height: 30px;width: 90px" onclick="deletes('+row.id+')" class="btn btn-default" data-dismiss="modal">删除</button>' + '<button type="button" style="height: 30px;width: 90px" onclick="editBook('+row.id+')" class="btn btn-default">修改</button>';
+                }}*/
+            ]
+        })
+    }
+
+    /* 跳转 */
+    var res;
+    function createAddContent(url){
+        $.ajax({
+            url:url,
+            async:false,
+            success:function(data){
+                res = data;
+            }
+        });
+        return res;
+    }
+
+    /**
+     * 授权
+     * @param id
+     */
+    //打开修改dialog
+    function approved(id){
+        bootbox.dialog({
+            title:'修改用户',
+            /* 页面跳转*/
+            message: createAddContent('../toApprovedNotAudit'),
+            closeButton: true,
+            buttons : {
+                "success" : {
+                    "label" : '<i class="icon-ok"></i> 保存',
+                    "className" : "btn-sm btn-success",
+                    "callback" : function() {
+                        $.ajax({
+                            url:'../saveOrUpdateCar',
+                            type:'post',
+                            data:$("#updateForm").serialize(),
+                            dataType:'json',
+                            success:function(data){
+                                if(data == 1 ){
+                                    location.href=location;
+                                }
+
+                            }
+                        });
+                    }
+                },
+                "cancel" : {
+                    "label" : '<i class="icon-info"></i> 取消',
+                    "className" : "btn-sm btn-danger",
+                    "callback" : function() {
+
+                    }
+                }
+            }
+        });
+        // 回显操作
+        $.ajax({
+            url:'../queryByCarId',
+            type:'post',
+            data:{id:id},
+            dataType:'json',
+            success:function(data){
+                $('#iddd').val(data.id);
+                $('#carType').html(data.carType);
+                $('#carType1').val(data.carType);
+                $('#carVehiclecondition').html(data.carVehiclecondition);
+                $('#carVehiclecondition1').val(data.carVehiclecondition);
+                $('#carRoadroller').html(data.carRoadroller);
+                $('#carRoadroller1').val(data.carRoadroller);
+                $('#carLicenseplatenumber').html(data.carLicenseplatenumber);
+                $('#carLicenseplatenumber1').val(data.carLicenseplatenumber);
+
+                $('#carSeriesss').val(data.carSeries);
+                $('#carLicenseYearStr').val(data.carLicenseYearStr);
+                $('#carLicenseMonthStr').val(data.carLicenseMonthStr);
+                $('#carLicencesto').val(data.carLicencesto);
+                $('#carDemand').val(data.carDemand);
+                $('#carPrice').val(data.carPrice);
+                $('#carDisplacement').val(data.carDisplacement);
+                $('#carStatus').val(data.carStatus);
+                $('#carSite').val(data.carSite);
+                $('#carDetails').val(data.carDetails);
+
+                $('#username').html(data.userBean.username);
+                $('#phone').html(data.userBean.phone);
+                /*$('input[name="booktype"]').each(function(){
+                    var sexId = $(this).val();
+                    if (sexId == data.booktype) {
+                        $(this).prop('checked','true');
+                    }
+                })*/
+
+                $('#testimg').val(data.carImg);
+                /*initImg(data.carImg);*/
+            }
+        })
+    }
+
+    function deleteOne(id) {
+        $.ajax({
+            url : "../deleteOne?id="+id,
+            async : true,
+            type: "POST",
+            processData: false,
+            contentType:false,
+            dataType: "json",
+            success : function(data) {
+                if(data == 1){
+                    $('#myTable').bootstrapTable('refresh');
+                }
+            },
+            error : function(e){
+                alert("代码有问题，请打开F12和debug进行调试！");
+            }
+        });
+    }
+
+
+   /* function approved(id) {
+        $.ajax({
+            url : "../approved?id="+id,
+            async : true,
+            type: "POST",
+            processData: false,
+            contentType:false,
+            dataType: "json",
+            success : function(data) {
+                if(data == 1){
+                    $('#myTable').bootstrapTable('refresh');
+                }
+            },
+            error : function(e){
+                alert("代码有问题，请打开F12和debug进行调试！");
+            }
+        });
+    }*/
+
+
+
+</script>
+</html>
